@@ -1,7 +1,8 @@
 /*
   Intended to be ran client side. Setup a directory under IIS with directory listing enabled and pass the path into addFilesToPage
   loadFile can be used with arbitrary content, feed it the url and mime type
-  fileTypeTest is a type map function that allows you to test a file extension via regex and assign its mime-type accordingly and then passes it through the loadFile function so it can be viewed without leaving the page.
+  fileTypeTest is a type map function that allows you to test a file extension via regex and assign its mime-type accordingly and then passes it through the loadFile function so it can be viewed without leaving the page
+  listener is a function used to remove the viewer modal if it's closed/clicked out of
 */
 
 function loadFile(file, type) {
@@ -25,6 +26,18 @@ function loadFile(file, type) {
   resourceBody.appendChild(resource);
   document.addEventListener("click", listener, true);
   document.getElementById("overlay-back").style.display = "block";
+}
+
+function listener(event) {
+  var isClickInside = resourceContainer.contains(event.target);
+  var closeClicked = resourceClose.contains(event.target);
+  if (!isClickInside || closeClicked) {
+    document.body.removeChild(resourceContainer);
+    resourceContainer = undefined;
+    resource = undefined;
+    document.removeEventListener("click", listener, true);
+    document.getElementById("overlay-back").style.display = "none";
+  }
 }
 
 function fileTypeTest(fileElement) {
